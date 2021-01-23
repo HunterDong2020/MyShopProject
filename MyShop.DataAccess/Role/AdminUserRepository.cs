@@ -12,9 +12,11 @@ using Dapper;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
+using MyShop.Common.Denpendency;
 
 namespace MyShop.DataAccess.Role
 {
+    [DIdependent]
     public class AdminUserRepository : BaseRepository<AdminUserEntity>, IAdminUserRepository
     {
         public AdminUserEntity QueryAdminUserOne(AdminUserRequest request)

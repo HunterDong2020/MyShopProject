@@ -10,9 +10,11 @@ using MyShop.Model.Role;
 using MyShop.Model.Base;
 using MyShop.Common.Utility;
 using Newtonsoft.Json;
+using MyShop.Common.Denpendency;
 
 namespace MyShop.Core.Role
 {
+    [DIdependent]
     public class AdminUserService : IAdminUserService
     {
         IAdminUserRepository adminUser;

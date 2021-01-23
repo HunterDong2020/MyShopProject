@@ -11,9 +11,11 @@ using System.Text;
 using System.Linq;
 using System.Data.Common;
 using MyShop.Common.Utility;
+using MyShop.Common.Denpendency;
 
 namespace MyShop.DataAccess.Role
 {
+    [DIdependent]
     public class RoleRepository : BaseRepository<RoleEntity>, IRoleRepository
     {
         public RoleEntity QueryAdminRoleOne(RoleRequest request)

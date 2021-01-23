@@ -9,9 +9,11 @@ using System.Text;
 using Dapper;
 using MyShop.Model.Role.Request;
 using System.Linq;
+using MyShop.Common.Denpendency;
 
 namespace MyShop.DataAccess.Role
 {
+    [DIdependent]
     public class RoleAndUserRelationRepository : BaseRepository<RoleAndUserRelationEntity>, IRoleAndUserRelationRepository
     {
         public List<RoleAndUserRelationEntity> QueryRoleBindUser(RoleAndUserRelationRequest request, out int total)

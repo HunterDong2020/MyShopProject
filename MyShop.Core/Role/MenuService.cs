@@ -8,9 +8,11 @@ using System.Linq;
 using MyShop.Model.Role;
 using MyShop.Model.Base;
 using MyShop.Model.Role.Request;
+using MyShop.Common.Denpendency;
 
 namespace MyShop.Core.Role
 {
+    [DIdependent]
     public class MenuService : IMeuService
     {
         IMenuRepository menuRepository;

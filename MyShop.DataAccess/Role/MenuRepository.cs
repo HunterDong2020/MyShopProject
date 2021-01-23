@@ -9,9 +9,11 @@ using Dapper;
 using System.Data.SqlClient;
 using System.Linq;
 using MyShop.Model.Role.Request;
+using MyShop.Common.Denpendency;
 
 namespace MyShop.DataAccess.Role
 {
+    [DIdependent]
     public class MenuRepository : BaseRepository<MenuEntity>, IMenuRepository
     {
         public List<MenuEntity> QueryALLMenuList(AdminMenuRequest request)

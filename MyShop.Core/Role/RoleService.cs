@@ -1,4 +1,5 @@
-﻿using MyShop.Common.Utility;
+﻿using MyShop.Common.Denpendency;
+using MyShop.Common.Utility;
 using MyShop.Core.Role.IService;
 using MyShop.DataAccess.Role.IRepository;
 using MyShop.Model.Base;
@@ -12,6 +13,7 @@ using System.Text;
 
 namespace MyShop.Core.Role
 {
+    [DIdependent]
     public class RoleService : IRoleService
     {
         IRoleRepository adminRole;

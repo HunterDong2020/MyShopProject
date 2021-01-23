@@ -11,9 +11,11 @@ using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using MyShop.Common.Utility;
+using MyShop.Common.Denpendency;
 
 namespace MyShop.DataAccess.Role
 {
+    [DIdependent]
     public class MenuAndRoleRelationRepository : BaseRepository<MenuAndRoleRelationEntity>, IMenuAndRoleRelationRepository
     {
         public List<MenuAndRoleRelationEntity> QueryRoleAndMenuList(MenuAndRoleRelationRequest request)
