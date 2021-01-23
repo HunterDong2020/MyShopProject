@@ -67,17 +67,25 @@
                 form.val("formuserinfo", JSON.parse(JSON.stringify(insertData)));
 
             } else if ('@Type' == 'update') {
-                $.post("/AdminMenu/GetMenuById", { id: '@MenuId' }, function (data) {
-                    if (data != null) {
-                        var menuData = {
-                            ParentMenuName: data.ParentName,
-                            ParentMenuId: data.ParentMenuId,
-                            MenuId: data.Id,
-                            MenuName: data.MenuName,
-                            MenuUrl: data.MenuUrl,
-                            MenuSort: data.MenuSort
-                        };
-                        form.val("formuserinfo", JSON.parse(JSON.stringify(menuData)));
+                $.ajax({
+                    type: "POST",
+                    url: "/AdminMenu/GetMenuById",
+                    data: { id: '@MenuId' },
+                    dataType: "JSON",
+                    async: false,
+                    cache: false,
+                    success: function (data) {
+                        if (data != null) {
+                            var menuData = {
+                                ParentMenuName: data.ParentName,
+                                ParentMenuId: data.ParentMenuId,
+                                MenuId: data.Id,
+                                MenuName: data.MenuName,
+                                MenuUrl: data.MenuUrl,
+                                MenuSort: data.MenuSort
+                            };
+                            form.val("formuserinfo", JSON.parse(JSON.stringify(menuData)));
+                        }
                     }
                 });
             }

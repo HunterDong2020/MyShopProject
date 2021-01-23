@@ -47,7 +47,7 @@ namespace MyShop.WebAdmin.Controllers.Role
             };
             var result = _isAdminUserService.QueryUserListPage(paramRequest);
 
-            _logger.LogInformation($"用户数据:{JsonConvert.SerializeObject(result)}");
+            //_logger.LogInformation($"用户数据:{JsonConvert.SerializeObject(result)}");
             return Json(result);
         }
 
