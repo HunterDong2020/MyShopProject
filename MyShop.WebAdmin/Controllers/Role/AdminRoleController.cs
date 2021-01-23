@@ -138,6 +138,7 @@ namespace MyShop.WebAdmin.Controllers.Role
             }
         }
 
+        [HttpPost]
         public IActionResult SetRoleAndMenu(string roleId, string menuIds)
         {
             roleId = string.IsNullOrEmpty(roleId) ? "" : roleId.Trim();

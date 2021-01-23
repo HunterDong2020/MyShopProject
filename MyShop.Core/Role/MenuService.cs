@@ -24,45 +24,6 @@ namespace MyShop.Core.Role
             this.menuAndRoleRelation = _menuAndRole;
         }
 
-        /// <summary>
-        /// 获取菜单信息
-        /// </summary>
-        /// <returns></returns>
-        //public List<AdminMenuResponse> GetALLMenuList()
-        //{
-        //    var res = new List<AdminMenuResponse>();
-        //    var menuList = menuRepository.QueryALLMenuList(new Model.Role.Request.AdminMenuRequest());
-        //    if (menuList != null && menuList.Count() > 0)
-        //    {
-        //        //父结点
-        //        var parentMenu = menuList.Where(p => p.ParentMenuId == "");
-        //        AdminMenuResponse MenuResponse = null;
-        //        parentMenu.ToList().ForEach(p =>
-        //        {
-        //            MenuResponse = new AdminMenuResponse();
-        //            MenuResponse.id = p.Id;
-        //            MenuResponse.title = p.MenuName;
-        //            //子结点
-        //            var childrenMenu = menuList.Where(u => u.ParentMenuId == p.Id);
-        //            if (childrenMenu != null && childrenMenu.Count() > 0)
-        //            {
-        //                var childrenList = new List<ChildernMenu>();
-        //                childrenMenu.ToList().ForEach(u =>
-        //                {
-        //                    childrenList.Add(new ChildernMenu
-        //                    {
-        //                        id = u.Id,
-        //                        title = u.MenuName
-        //                    });
-        //                });
-        //                MenuResponse.children = childrenList;
-        //            }
-        //            res.Add(MenuResponse);
-        //        });
-        //    }
-        //    return res;
-        //}
-
         public List<MenuEntity> GetAllMenuList()
         {
             var list = menuRepository.QueryALLMenuList(new Model.Role.Request.AdminMenuRequest());
