@@ -95,7 +95,7 @@
                         layer.open({
                             skin: 'demo-class',
                             type: 1,
-                            title:"添加角色",
+                            title: "添加角色",
                             shade: [0.8, '#393D49'],
                             shadeClose: false,
                             maxmin: true,
@@ -126,7 +126,7 @@
                     layer.open({
                         type: 2
                         , title: '分配用户'
-                        , content: '/AdminRole/RoleBindUser?isView=0'   //弹框页面的地址
+                        , content: '/AdminRole/RoleBindUser?isView=0&roleId=' + data.Id   //弹框页面的地址
                         , maxmin: true
                         , area: ['55%', '70%']
                         , btn: ['确定', '取消']
@@ -171,7 +171,7 @@
                     layer.open({
                         type: 2
                         , title: '查看已分配用户'
-                        , content: '/AdminRole/RoleBindUser?isView=1&roleId='+data.Id
+                        , content: '/AdminRole/RoleBindUser?isView=1&roleId=' + data.Id
                         , maxmin: true
                         , area: ['52%', '70%']
                         , btn: ['取消']

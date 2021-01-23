@@ -99,6 +99,7 @@
                     url: '/AdminUser/GetUserManageList', //数据接口
                     cols: cols,
                     method: 'post',
+                    where: { userName: $("[name='userName']").val(), "roleId": $("#roleId").val() },
                     done: function (res) { },
                     parseData: function (res) {
                         return {

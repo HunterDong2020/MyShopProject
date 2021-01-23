@@ -55,9 +55,13 @@ namespace MyShop.DataAccess.Role
             if (!string.IsNullOrWhiteSpace(request.UserName))
             {
                 where_1 += " and a.UserName=@UserName";
-                dp.Add("UserName", request.UserName, DbType.String);
+                dp.Add("UserName", request.UserName, DbType.String, ParameterDirection.Input, 50);
             }
-
+            if (!string.IsNullOrWhiteSpace(request.RoleId))
+            {
+                where_1 += " and a.Id not in (select [UserMasterId] from [tblRoleAndUserRelation] with(nolock) where [RoleId]=@RoleId) ";
+                dp.Add("RoleId", request.RoleId, DbType.String, ParameterDirection.Input, 50);
+            }
             dp.Add("PageIndex", request.PageIndex, DbType.Int32, ParameterDirection.Input);
             dp.Add("PageSize", request.PageSize, DbType.Int32, ParameterDirection.Input);
 

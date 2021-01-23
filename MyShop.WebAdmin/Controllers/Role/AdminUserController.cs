@@ -36,11 +36,12 @@ namespace MyShop.WebAdmin.Controllers.Role
         /// 用户列表
         /// </summary>
         /// <returns></returns>
-        public IActionResult GetUserManageList(string userName, int limit, int page)
+        public IActionResult GetUserManageList(string userName, string roleId, int limit, int page)
         {
             var paramRequest = new AdminUserRequest
             {
                 UserName = userName,
+                RoleId = roleId,
                 PageIndex = page,
                 PageSize = limit
             };

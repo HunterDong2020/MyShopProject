@@ -16,5 +16,7 @@ namespace MyShop.Model.Role.Request
         public int IsDelete { get; set; }
 
         public List<string> IdList { get; set; }
+
+        public string RoleId { get; set; }
     }
 }
