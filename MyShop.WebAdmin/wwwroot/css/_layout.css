@@ -1,0 +1,37 @@
+﻿
+.layui-tab-item {position: absolute;top: 55px;bottom: 0;left: 0;right: 0;padding: 0;margin: 0;-webkit-overflow-scrolling: touch;}
+.layui-tab-content  iframe {width: 100%;height: 100%;border: none;min-width: 320px;}
+.ly_operate {/*padding: 20px;*/text-align: left;padding-left: 20px;padding-top: 20px;}
+.ly_main {padding:20px;/*margin-top: 20px;*/}
+.layui-form-item .ddzhif span {margin-right: 50px;}
+.layui-form-item .ddzhif span strong{color:#cc2222;}
+.layui-form-item .layui-inline {margin-right: 96px;margin-bottom: 20px}
+.layui-form-label {padding: 9px 0px;text-align:left;width:70px;}
+/*.layui-input-block{margin-left:80px;}
+.layui-input-block .layui-input{width:182px;}*/
+
+
+.ly_operate{background:#fff;}
+.ly_main{background:#fff;padding:0 20px;}
+.ly_main .guanli{padding:0;margin:0;width:auto;}
+.ly_main .guanli .gllist{margin-top:30px;}
+.ly_main .fabu{margin:0;width:auto;padding-bottom:20px;}
+.ly_main .fabu .fblist{padding:0;margin:0;}
+.ly_main .fabu .fblist .chaxun .submit{margin-bottom:20px;}
+.ly_main .fabu .fblist table{border-left:1px solid #e5e5e5;}
+.ly_main .fabu .shangxiajia { padding:0;width:auto;}
+.ly_operate{padding:20px;}
+.ly_operate .layui-container{width:auto;padding:0;}
+
+.layui-layout-admin .img{float:left;display:none;}
+.layui-layout-admin .img img{display:block;height:30px;margin-top:15px;margin-left:20px;}
+
+@media screen and (max-width: 1024px) { 
+ .layui-side{display:none;}
+ .layui-body { left: 0;}
+ .layui-layout-admin .layui-logo {left: 50px;}
+ .layui-layout-admin .img{display:block;}
+}
+@media screen and (min-width: 1024px) { 
+    .layui-side{display:block !important;}
+}

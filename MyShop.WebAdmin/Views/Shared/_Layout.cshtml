@@ -1,0 +1,23 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>康润实验采购商城管理平台</title>
+    <link href="~/lib/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/css/_layout.css" rel="stylesheet" />
+    <script src="~/lib/jquery/jquery-1.10.2.min.js"></script>
+    <script src="~/lib/layui/layui.js"></script>
+</head>
+<body>
+    <div class="ly_main">
+        @RenderBody()
+    </div>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

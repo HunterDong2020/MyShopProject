@@ -1,0 +1,130 @@
+﻿
+@{
+    Layout = null;
+
+    var MenuId = !string.IsNullOrEmpty(ViewBag.MenuId) ? ViewBag.MenuId.ToString() : ViewBag.MenuId;
+    var ParentMenuName = !string.IsNullOrEmpty(ViewBag.ParentMenuName) ? ViewBag.ParentMenuName.ToString() : ViewBag.ParentMenuName;
+    var Type = !string.IsNullOrEmpty(ViewBag.Type) ? ViewBag.Type.ToString() : ViewBag.Type;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>康润实验采购商城管理平台</title>
+    <link href="~/lib/layui/css/layui.css" rel="stylesheet" />
+    <script src="~/lib/jquery/jquery-1.10.2.min.js"></script>
+    <script src="~/lib/layui/layui.js"></script>
+</head>
+<body>
+    <div id="formMenu">
+        <form class="layui-form" lay-filter="formuserinfo">
+            <input type="hidden" id="hidMenuId" name="MenuId" />
+            <input type="hidden" id="hidParentId" name="ParentMenuId" />
+            <div class="layui-form-item" style="margin-top:10px;">
+                <label class="layui-form-label">父菜单名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="ParentMenuName" id="txtParentName" placeholder="请输入父菜单名称" value="" disabled="disabled" autocomplete="off" class="layui-input" style="width:80%;">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">菜单名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="MenuName" id="txtMenuName" required lay-verify="required" placeholder="请输入菜单名称" autocomplete="off" class="layui-input" style="width:80%;">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">菜单地址</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="MenuUrl" id="txtMenuUrl" placeholder="请输入菜单地址" autocomplete="off" class="layui-input" style="width:80%;">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">菜单排序</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="MenuSort" id="txtSort" required lay-verify="required" placeholder="请输入菜单排序" autocomplete="off" class="layui-input" style="width:80%;">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <input class="layui-btn" type="button" lay-submit lay-filter="addmenuForm" value="立即提交">
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        layui.use(['form', 'jquery', 'layer', 'tree'], function () {
+            var tree = layui.tree;
+            var $ = layui.jquery;
+            var form = layui.form;
+            var layer = layui.layer;
+
+            if ('@Type' == 'insert') {
+                var insertData = { ParentMenuName: '@ParentMenuName', ParentMenuId: '@MenuId' };
+                form.val("formuserinfo", JSON.parse(JSON.stringify(insertData)));
+
+            } else if ('@Type' == 'update') {
+                $.post("/AdminMenu/GetMenuById", { id: '@MenuId' }, function (data) {
+                    if (data != null) {
+                        var menuData = {
+                            ParentMenuName: data.ParentName,
+                            ParentMenuId: data.ParentMenuId,
+                            MenuId: data.Id,
+                            MenuName: data.MenuName,
+                            MenuUrl: data.MenuUrl,
+                            MenuSort: data.MenuSort
+                        };
+                        form.val("formuserinfo", JSON.parse(JSON.stringify(menuData)));
+                    }
+                });
+            }
+
+            //form监听提交
+            form.on('submit(addmenuForm)', function (data) {
+                if ('@Type' == "insert") {
+                    var pramStr = JSON.stringify(data.field);
+                    $.ajax({
+                        type: "POST",
+                        url: "/AdminMenu/InsertOrUpdateAdminMenu",
+                        data: { param: pramStr, type: "insert" },
+                        dataType: "JSON",
+                        success: function (msg) {
+                            if (!msg.IsSuccess) {
+                                layer.alert(msg.Msg);
+                                return;
+                            }
+                            layer.alert(msg.Msg, function () {
+                                parent.layer.closeAll();
+                                parent.location.reload();
+                            });
+                        }
+                    });
+                } else if ('@Type' == "update") {
+                    var pramStr = JSON.stringify(data.field);
+                    $.ajax({
+                        type: "POST",
+                        url: "/AdminMenu/InsertOrUpdateAdminMenu",
+                        data: { param: pramStr, type: "update" },
+                        dataType: "JSON",
+                        success: function (msg) {
+                            if (!msg.IsSuccess) {
+                                layer.alert(msg.Msg);
+                                return;
+                            }
+                            layer.alert(msg.Msg, function () {
+                                parent.layer.closeAll();
+                                parent.location.reload();
+                            });
+                        }
+                    });
+                }
+                return false;
+            });
+        });
+
+    </script>
+</body>
+</html>

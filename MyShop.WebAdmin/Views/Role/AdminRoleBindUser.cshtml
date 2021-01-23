@@ -1,0 +1,141 @@
+﻿
+@{
+    Layout = null;
+
+    var IsView = ViewBag.IsView;
+    var RoleId = ViewBag.RoleId;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>康润实验采购商城管理平台</title>
+    <link href="~/lib/layui/css/layui.css" rel="stylesheet" />
+    <script src="~/lib/jquery/jquery-1.10.2.min.js"></script>
+    <script src="~/lib/layui/layui.js"></script>
+</head>
+<body>
+    <div class="layui-fluid" style="margin-top: 30px;">
+        <div class="layui-card">
+            <div class="layui-form ">
+                <div class="layui-form-item">
+                    <input type="hidden" value="@RoleId" name="roleId" id="roleId" />
+                    <div class="layui-inline">
+                        <label class="layui-form-label" style="width: 100px;">用户账号</label>
+                        <div class="layui-input-inline" style="width: 300px; margin-right: 57px;">
+                            <input type="text" name="userName" class="layui-input" value="">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="LAY-user-front-search">
+                            <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                            <lable i18n="footer.search">搜索</lable>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-card-body">
+                <table id="LAY-UserList" lay-filter="LAY-UserList"></table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        layui.use(['form', 'jquery', 'table', 'layer', 'laydate'], function () {
+            var $ = layui.jquery;
+            var form = layui.form;
+            var table = layui.table;
+
+            if (@IsView== 1) {
+                //表格加载
+                var cols = [[
+                     { field: 'UserName', title: '用户账号', width: 120 }
+                    , { field: 'RoleName', title: '角色名称', width: 150 }
+                    , { field: 'RealName', title: '真实姓名', width: 120 }
+                    , { field: 'MobilePhone', title: '手机号码', width: 120 }
+                    , { field: 'CreateUser', title: '创建人', width: 190 }
+                    , { field: 'CreateTimeStr', title: '创建时间', width: 190 }
+                ]]
+                var tableIns = table.render({
+                    elem: '#LAY-UserList',
+                    url: '/AdminRole/GetAdminRoleBindUserList', //数据接口
+                    cols: cols,
+                    method: 'post',
+                    where: { userName: $("[name='userName']").val(), "roleId": $("#roleId").val()},
+                    done: function (res) { },
+                    parseData: function (res) {
+                        return {
+                            code: res.code, //解析接口状态
+                            msg: res.msg, //解析提示文本
+                            count: res.count ? res.count : 0, //解析数据长度
+                            data: res.data, //解析数据列表
+                        }
+                    },
+                    page: true,
+                    text: {
+                        none: '暂无相关数据',
+                    },
+                    defaultToolbar: [],
+                })
+            } else {
+                //表格加载
+                var cols = [[
+                    { type: 'checkbox', fixed: 'left' }
+                    , { field: 'Id', title: 'Id', hide: true }
+                    , { field: 'UserName', title: '登录账号', width: 120 }
+                    , { field: 'RealName', title: '真实姓名', width: 120 }
+                    , { field: 'MobilePhone', title: '手机号码', width: 120 }
+                    , {
+                        field: 'IsDelete', title: '状态', width: 120, templet: function (d) { if (d.IsDelete == 1) { return "禁用" } if (d.IsDelete == 0) { return "启用" } }
+                    }
+                    , { field: 'Remark', title: '备注', width: 180 }
+                    , { field: 'CreateTimeStr', title: '创建时间', width: 190 }
+                ]]
+                var tableIns = table.render({
+                    elem: '#LAY-UserList',
+                    url: '/AdminUser/GetUserManageList', //数据接口
+                    cols: cols,
+                    method: 'post',
+                    done: function (res) { },
+                    parseData: function (res) {
+                        return {
+                            code: res.code, //解析接口状态
+                            msg: res.msg, //解析提示文本
+                            count: res.count ? res.count : 0, //解析数据长度
+                            data: res.data, //解析数据列表
+                        }
+                    },
+                    page: true,
+                    text: {
+                        none: '暂无相关数据',
+                    },
+                    defaultToolbar: [],
+                })
+            }
+
+
+            //搜索事件
+            form.on('submit(LAY-user-front-search)', function (data) {
+                var field = data.field
+                //执行重载
+                tableIns.reload({
+                    page: {
+                        curr: 1,
+                    },
+                    where: field,
+                })
+            })
+        });
+
+    </script>
+</body>
+</html>
+
+
+
+
+
+

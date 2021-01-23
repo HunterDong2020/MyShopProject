@@ -1,0 +1,124 @@
+﻿
+@{
+    Layout = null;
+    var RoleId = ViewBag.RoleId;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>康润实验采购商城管理平台</title>
+    <link href="~/lib/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/lib/zTree_v3/css/bootstrapStyle/bootstrapStyle.css" rel="stylesheet" />
+    <script src="~/lib/jquery/jquery-1.10.2.min.js"></script>
+    <script src="~/lib/layui/layui.js"></script>
+    <script src="~/lib/zTree_v3/js/jquery.ztree.core.min.js"></script>
+    <script src="~/lib/zTree_v3/js/jquery.ztree.exedit.min.js"></script>
+    <script src="~/lib/zTree_v3/js/jquery.ztree.excheck.min.js"></script>
+</head>
+<body>
+    <div class="layui-row" style="padding-left: 5px;">
+        <ul id="tree" class="ztree"></ul>
+    </div>
+    <script>
+        function ZTreeOnCheck() {
+            ZTreeOnCheck();
+        }
+
+        layui.use(['form', 'jquery', 'layer', 'tree'], function () {
+            var tree = layui.tree;
+            var $ = layui.jquery;
+            var form = layui.form;
+            var layer = layui.layer;
+
+            /**
+            * zTree 初始化方法：$.fn.zTree.init(t, setting, zNodes)
+            * t:用于展现 zTree 的 DOM 容器
+            * setting:zTree 的配置数据
+            * zNodes:zTree 的节点数据
+            */
+            var zNodes = InitMenu();
+            $.fn.zTree.init($("#tree"), InitSetting(), zNodes);
+
+            //初始化菜单
+            function InitMenu() {
+                var Json = [];
+                $.ajax({
+                    type: "post",
+                    url: "/AdminMenu/GetALLMenu",
+                    async: false,
+                    cache: false,
+                    dataType: "json",
+                    data: { roleId: '@RoleId' },
+                    success: function (data) {
+                        if (data == null) {
+                            return [];
+                        }
+                        var mainMenuId = "";
+                        for (var i = 0; i < data.length; i++) {
+                            var menuSigle = {
+                                id: data[i].Id,
+                                name: data[i].MenuName,
+                                pId: data[i].ParentMenuId,
+                                checked: data[i].NoCheck
+                            };
+                            menuSigle.open = true;
+                            Json.push(menuSigle);
+                        }
+                    }, error: function () {
+                        layer.alert("加载菜单异常！");
+                    }
+                });
+                return Json;
+            }
+            //初始化配置
+            function InitSetting() {
+                var setting = {
+                    check: {
+                        enable: true,
+                        nocheckInherit: false
+                    },
+                    data: {
+                        simpleData: {
+                            enable: true,
+                            idKey: "id",
+                            pIdKey: "pId",
+                            rootPId: null
+                        }
+                    },
+                    callback: {
+                        //树复选框选中事件
+                        onCheck: ZTreeOnCheck
+                    }
+                }
+                return setting;
+            }
+
+            window.ZTreeOnCheck = function (event, treeId, treeNode) {
+                var userTreeObj = $.fn.zTree.getZTreeObj("tree");
+                var userNodes = userTreeObj.getCheckedNodes(true);
+
+                var menuIds = "";
+                if (userNodes != null && userNodes.length > 0) {
+                    for (var i = 0; i < userNodes.length; i++) {
+                        if (menuIds != "")
+                            menuIds += ",";
+                        menuIds += userNodes[i].id;
+                    }
+                }
+                var roleId = '@RoleId';
+                $.post("/AdminRole/SetRoleAndMenu", { roleId: roleId, menuIds: menuIds }, function (data) {
+                    layer.alert("设置" + data.Msg);
+                    if (data.IsSuccess) {
+                        //重新加载菜单
+                        var zNodes = InitMenu();
+                        $.fn.zTree.init($("#tree"), InitSetting(), zNodes);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

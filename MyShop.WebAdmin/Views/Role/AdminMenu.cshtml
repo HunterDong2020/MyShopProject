@@ -1,0 +1,224 @@
+﻿
+@{
+    ViewBag.Title = "菜单列表";
+}
+<link href="~/lib/zTree_v3/css/bootstrapStyle/bootstrapStyle.css" rel="stylesheet" />
+
+
+<div class="layui-row" style="padding-top:10px;">
+    <div class="layui-col-md12">
+        <ul id="tree" class="ztree"></ul>
+    </div>
+</div>
+
+<!--from表单-->
+<input id="hidOperation" value="" type="hidden" />
+<div id="formMenu" style="display:none;">
+    <form class="layui-form" lay-filter="formuserinfo">
+        <input type="hidden" id="hidMenuId" />
+        <input type="hidden" id="hidParentId" name="ParentMenuId" />
+        <div class="layui-form-item" style="margin-top:10px;">
+            <label class="layui-form-label">父菜单名称</label>
+            <div class="layui-input-inline">
+                <input type="text" name="ParentMenuName" id="txtParentName" required lay-verify="required" placeholder="请输入父菜单名称" value="123" autocomplete="off" class="layui-input" style="width:80%;">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">菜单名称</label>
+            <div class="layui-input-inline">
+                <input type="text" name="MenuName" id="txtMenuName" required lay-verify="required" placeholder="请输入菜单名称" autocomplete="off" class="layui-input" style="width:80%;">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">菜单地址</label>
+            <div class="layui-input-inline">
+                <input type="text" name="MenuUrl" id="txtMenuUrl" required lay-verify="required" placeholder="请输入菜单地址" autocomplete="off" class="layui-input" style="width:80%;">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">菜单排序</label>
+            <div class="layui-input-inline">
+                <input type="text" name="MenuSort" id="txtSort" required lay-verify="required" placeholder="请输入菜单排序" autocomplete="off" class="layui-input" style="width:80%;">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <input class="layui-btn" type="button" lay-submit lay-filter="addmenuForm" value="立即提交">
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script src="~/lib/zTree_v3/js/jquery.ztree.core.min.js"></script>
+<script src="~/lib/zTree_v3/js/jquery.ztree.exedit.min.js"></script>
+@section Scripts{
+    <script>
+        function AddNode() {
+            AddNode();
+        }
+        function UpdateNode() {
+            UpdateNode();
+        }
+        function DeleteNode() {
+            DeleteNode();
+        }
+
+        layui.use(['form', 'jquery', 'layer', 'tree'], function () {
+            var tree = layui.tree;
+            var $ = layui.jquery;
+            var form = layui.form;
+            var layer = layui.layer;
+
+            var zNodes = InitMenu();
+            $.fn.zTree.init($("#tree"), InitSetting(), zNodes);
+
+            //初始化菜单
+            function InitMenu() {
+                var Json = [];
+                $.ajax({
+                    type: "post",
+                    url: "/AdminMenu/GetAllMenu",
+                    async: false,
+                    cache: false,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data == null) {
+                            return [];
+                        }
+                        var mainMenuId = "";
+                        for (var i = 0; i < data.length; i++) {
+                            var menuSigle = {
+                                id: data[i].Id,
+                                name: data[i].MenuName,
+                                pId: data[i].ParentMenuId
+                            };
+                            menuSigle.open = true;
+                            //if (data[i].ParentMenuId == "") {
+                            //    menuSigle.open = true;
+                            //    mainMenuId = data[i].Id;
+                            //}
+                            //if (mainMenuId == data[i].ParentMenuId) {
+                            //    menuSigle.open = true;
+                            //}
+                            Json.push(menuSigle);
+                        }
+                    }, error: function () {
+                        layer.alert("加载菜单异常！");
+                    }
+                });
+                return Json;
+            }
+
+            //初始化配置
+            function InitSetting() {
+                var setting = {
+                    view: {
+                        addHoverDom: AddHoverDom,
+                        removeHoverDom: RemoveHoverDom,
+                        selectedMulti: false,
+                    },
+                    data: {
+                        simpleData: {
+                            enable: true,
+                            idKey: "id",
+                            pIdKey: "pId",
+                            rootPId: null
+                        }
+                    }
+                }
+                return setting;
+            }
+
+            //自定义按钮
+            function AddHoverDom(treeId, treeNode) {
+                var ShowButtonJson = { IsShowDeleteBut: true, IsShowUpdateBut: true, IsShowInsertBut: true };
+                var sObj = $("#" + treeNode.tId + "_span");
+                if (treeNode.editNameFlag || $("#addBtn_" + treeNode.tId).length > 0) {
+                    return;
+                }
+                if (treeNode.editNameFlag || $("#delBtn_" + treeNode.tId).length > 0) {
+                    return;
+                }
+                if (treeNode.editNameFlag || $("#updBtn_" + treeNode.tId).length > 0) {
+                    return;
+                }
+                //删除
+                if (ShowButtonJson.IsShowDeleteBut && treeNode.level != 0) {
+                    var delStr = "<span class='button remove' id='delBtn_" + treeNode.tId
+                        + "' title='删除菜单信息' onclick='DeleteNode(\"" + treeNode.id + "\",\"" + treeNode.name + "\")'></span>";
+                    sObj.after(delStr);
+                }
+                //修改
+                if (ShowButtonJson.IsShowUpdateBut) {
+                    var updStr = "<span class='button edit' id='updBtn_" + treeNode.tId
+                        + "' title='修改菜单信息' onclick='UpdateNode(\"" + treeNode.id + "\")'></span>";
+                    sObj.after(updStr);
+                }
+                //添加
+                if (ShowButtonJson.IsShowInsertBut) {
+                    var addStr = "<span class='button add' id='addBtn_" + treeNode.tId
+                        + "' title='添加菜单信息' onclick='AddNode(\"" + treeNode.id + "\",\"" + treeNode.name + "\")';></span>";
+                    sObj.after(addStr);
+                }
+            }
+            //隐藏按钮
+            function RemoveHoverDom(treeId, treeNode) {
+                $("#addBtn_" + treeNode.tId).unbind().remove();
+                $("#updBtn_" + treeNode.tId).unbind().remove();
+                $("#delBtn_" + treeNode.tId).unbind().remove();
+            }
+
+            //添加
+            window.AddNode = function (id, name) {
+                layer.open({
+                    skin: 'demo-class',
+                    type: 2,
+                    title: '添加菜单',
+                    shade: [0.8, '#393D49'],
+                    shadeClose: false,
+                    maxmin: true,
+                    area: ['680px', '360px'],
+                    content: "/AdminMenu/MenuFormIndex?type=insert&parentmenu=" + name + "&id=" + id
+                });
+            }
+            //修改
+            window.UpdateNode = function (id) {
+                //调用弹窗
+                layer.open({
+                    skin: 'demo-class',
+                    type: 2,
+                    title: '修改菜单',
+                    shade: [0.8, '#393D49'],
+                    shadeClose: false,
+                    maxmin: true,
+                    area: ['680px', '360px'],
+                    content: "/AdminMenu/MenuFormIndex?type=update&id=" + id
+                });
+            }
+            //删除
+            window.DeleteNode = function (id, name) {
+                layer.confirm('您确定要删除 -->【' + name + "】及其子菜单吗?", function () {
+                    $.post("/AdminMenu/DeleteMenu", { id: id }, function (data) {
+                        layer.alert(data.Msg);
+                        if (data.IsSuccess) {
+                            var zNodes = InitMenu();
+                            $.fn.zTree.init($("#tree"), InitSetting(), zNodes);
+                        }
+                    });
+                });
+            }
+
+            //设置菜单选中样式
+            var $item = $('.layui-nav > .layui-nav-item .layui-nav-child').children();
+            $.each($item, function (i, val) {
+                if ($(this).find("a").text() == "菜单管理")
+                    $(this).addClass('layui-this');
+                else
+                    $(this).removeClass('layui-this');
+            });
+        });
+    </script>
+}
+
+

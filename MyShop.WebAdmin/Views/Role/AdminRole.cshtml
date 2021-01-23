@@ -1,0 +1,257 @@
+﻿
+@{
+    ViewBag.Title = "角色管理";
+}
+
+<div class="layui-row" style="padding-left: 5px;padding-top:10px;">
+    <div class="demoTable">
+        角色名称：
+        <div class="layui-inline">
+            <input class="layui-input" name="searchRoleName" id="searchRoleName" autocomplete="off">
+        </div>
+        <button class="layui-btn" data-type="reload">
+            <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>搜索
+        </button>
+    </div>
+
+    <div class="layui-col-md12">
+        <table id="tblRole" lay-filter="tblRole"></table>
+    </div>
+
+    <script type="text/html" id="toolbarDemo">
+        <div class="layui-btn-container">
+            <button class="layui-btn layui-btn-sm" lay-event="addRole">
+                <i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>新增角色
+            </button>
+        </div>
+    </script>
+
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-xs" lay-event="bindusershow">
+            <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>查看已分配用户
+        </a>
+        <a class="layui-btn layui-btn-xs" lay-event="binduser">
+            <i class="layui-icon layui-icon-app layuiadmin-button-btn"></i>分配用户
+        </a>
+        <a class="layui-btn layui-btn-xs" lay-event="setpower">
+            <i class="layui-icon layui-icon-set layuiadmin-button-btn"></i>设置权限
+        </a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">
+            <i class="layui-icon layui-icon-delete layuiadmin-button-btn"></i>删除
+        </a>
+    </script>
+
+    <!--from表单-->
+    <div id="formRole" style="display:none;">
+        <form class="layui-form" lay-filter="formuserinfo" style="margin-top:10px;margin-left:10px;">
+            <div class="layui-form-item">
+                <label class="layui-form-label">角色名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="RoleName" lay-verify="adrolename" placeholder="请输入角色名称" autocomplete="off" class="layui-input" style="width:80%;">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <input class="layui-btn" type="button" lay-submit lay-filter="adduserForm" value="立即提交">
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        layui.use(['form', 'jquery', 'table', 'layer'], function () {
+            var $ = layui.jquery;
+            var form = layui.form;
+            var table = layui.table;
+            var layer = layui.layer;
+
+            //表格加载
+            table.render({
+                elem: '#tblRole'
+                , url: '/AdminRole/GetAdminRoleList' //数据接口
+                , page: true //开启分页
+                , toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+                , defaultToolbar: []
+                , title: '用户数据表'
+                , limit: 10   //一页能够显示的最大数目
+                , limits: [10, 15, 20]
+                , method: 'post'  //提交方式
+                , cols: [[ //表头
+                    { field: 'RoleName', title: '角色名称', width: 190 }
+                    , { field: 'CreateTimeStr', title: '创建时间', width: 190 }
+                    , { fixed: 'right', title: '操作', toolbar: '#barDemo', width: 430 }
+                ]]
+                , id: 'testReload'
+            });
+
+            //头工具栏事件
+            table.on('toolbar(tblRole)', function (obj) {
+                switch (obj.event) {
+                    case 'addRole':
+                        layer.open({
+                            skin: 'demo-class',
+                            type: 1,
+                            title:"添加角色",
+                            shade: [0.8, '#393D49'],
+                            shadeClose: false,
+                            maxmin: true,
+                            area: ['680px', '250px'],
+                            content: $("#formRole").html()
+                        });
+                        break;
+                };
+            });
+
+            //行工具事件
+            table.on('tool(tblRole)', function (obj) {
+                var data = obj.data;
+                if (obj.event === 'del') {
+                    layer.confirm('是否确认删除?', function (index) {
+                        $.post("/AdminRole/DeleteAdminRole", { ids: data.Id }, function (msg) {
+                            if (!msg.IsSuccess) {
+                                layer.alert(msg.Msg);
+                                return;
+                            }
+                            layer.alert("删除成功", function () {
+                                window.location.reload()
+                            });
+                        });
+                        layer.close(index);
+                    });
+                } else if (obj.event === 'binduser') {
+                    layer.open({
+                        type: 2
+                        , title: '分配用户'
+                        , content: '/AdminRole/RoleBindUser?isView=0'   //弹框页面的地址
+                        , maxmin: true
+                        , area: ['55%', '70%']
+                        , btn: ['确定', '取消']
+                        , yes: function (cindex, layero) {
+                            var iframeWindow = window['layui-layer-iframe' + cindex];
+                            var checkStatus = iframeWindow.layui.table.checkStatus('LAY-UserList');//获取选中行
+                            var checkData = checkStatus.data; //得到选中的数据
+                            if (checkData.length == 0) {
+                                return layer.msg('请选择用户');
+                            }
+                            var roleAndUserArr = [];
+                            for (var i = 0; i < checkData.length; i++) {
+                                var roleAndUser = {
+                                    RoleId: data.Id,
+                                    UserMasterId: checkData[i].Id,
+                                    IsDelete: 0
+                                };
+                                roleAndUserArr.push(roleAndUser);
+                            }
+                            $.ajax({
+                                type: "POST",
+                                url: "/AdminRole/BindRoleAndUser",
+                                data: { roleAndUser: JSON.stringify(roleAndUserArr) },
+                                dataType: "JSON",
+                                success: function (msg) {
+                                    if (!msg.IsSuccess) {
+                                        layer.alert(msg.Msg);
+                                        return;
+                                    }
+                                    layer.alert(msg.Msg, function () {
+                                        window.location.reload();
+                                    });
+                                }, complete: function () {
+                                    layer.close(cindex);
+                                }, error: function () {
+                                    layer.close(cindex);
+                                }
+                            });
+                        }
+                    });
+                } else if (obj.event == 'bindusershow') {
+                    layer.open({
+                        type: 2
+                        , title: '查看已分配用户'
+                        , content: '/AdminRole/RoleBindUser?isView=1&roleId='+data.Id
+                        , maxmin: true
+                        , area: ['52%', '70%']
+                        , btn: ['取消']
+                        , yes: function (cindex, layero) {
+                            layer.close(cindex);
+                        }
+                    });
+                } else if (obj.event == 'setpower') {
+                    layer.open({
+                        type: 2
+                        , title: '设置权限'
+                        , content: '/AdminRole/RoleBindMenu?roleId=' + data.Id
+                        , maxmin: true
+                        , area: ['52%', '70%']
+                        , btn: ['取消']
+                        , yes: function (cindex, layero) {
+                            layer.close(cindex);
+                        }
+                    });
+                }
+            });
+
+            //查询事件
+            var $ = layui.$, active = {
+                reload: function () {
+                    var searchRoleName = $('#searchRoleName');
+                    //执行重载
+                    table.reload('testReload', {
+                        page: {
+                            curr: 1 //重新从第 1 页开始
+                        }
+                        , where: {
+                            roleName: searchRoleName.val()
+                        }
+                    }, 'data');
+                }
+            };
+            $('.demoTable .layui-btn').on('click', function () {
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+
+            //form监听提交
+            form.on('submit(adduserForm)', function (data) {
+                var pramStr = JSON.stringify(data.field);
+                $.ajax({
+                    type: "POST",
+                    url: "/AdminRole/AddAdminRole",
+                    data: { param: pramStr },
+                    dataType: "JSON",
+                    success: function (msg) {
+                        if (!msg.IsSuccess) {
+                            layer.alert(msg.Msg);
+                            return;
+                        }
+                        layer.alert(msg.Msg, function () {
+                            window.location.reload();
+                        });
+                    }
+                });
+                return false;
+            });
+
+            //form自定义验证规则
+            form.verify({
+                adrolename: function (value) {
+                    if (value.length < 2) return '角色名称至少2个字符';
+                    if (value.length > 30) return '角色名称不要超过30个字符';
+                },
+            });
+
+            //设置菜单选中样式
+            var $item = $('.layui-nav > .layui-nav-item .layui-nav-child').children();
+            $.each($item, function (i, val) {
+                if ($(this).find("a").text() == "角色管理")
+                    $(this).addClass('layui-this');
+                else
+                    $(this).removeClass('layui-this');
+            });
+        });
+    </script>
+}
+

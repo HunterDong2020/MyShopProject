@@ -1,0 +1,165 @@
+﻿@using MyShop.Model.Role.Response
+@{
+    Layout = null;
+    var MenuList = ViewData["LeftMenus"] as List<AdminMenuResponse>;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>康润实验采购商城管理平台-@ViewBag.Title</title>
+    <link href="~/lib/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/css/_layout.css" rel="stylesheet" />
+    <script src="~/lib/jquery/jquery-1.10.2.min.js"></script>
+    <script src="~/lib/layui/layui.js"></script>
+</head>
+<body class="layui-layout-body">
+    <div class="layui-layout layui-layout-admin">
+        <div class="layui-header">
+            <div class="layui-logo">后台管理</div>
+            <ul class="layui-nav layui-layout-right">
+                <li class="layui-nav-item">
+                    <a href="javascript:;">
+                        <img src="http://t.cn/RCzsdCq" class="layui-nav-img">
+                        @ViewBag.Contact
+                    </a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="">基本资料</a></dd>
+                        <dd><a href="">安全设置</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item"><a href="/AdminLogin/Logout">退出</a></li>
+            </ul>
+        </div>
+
+        <div class="layui-side layui-bg-black">
+            <div class="layui-side-scroll">
+                <ul class="layui-nav layui-nav-tree" lay-filter="test">
+                    @if (MenuList != null && MenuList.Count > 0)
+                    {
+                        foreach (var item in MenuList)
+                        {
+                            <li class="layui-nav-item layui-nav-itemed">
+                                <a href="javascript:;">@item.MenuName</a>
+                                <dl class="layui-nav-child">
+                                    @foreach (var child in item.MenuList.OrderBy(m => m.MenuSort))
+                                    {
+                                        <dd><a href="javascript:addTab('@child.Id','@child.MenuName','@child.MenuUrl');">@child.MenuName</a></dd>
+                                    }
+                                </dl>
+                            </li>
+                        }
+                    }
+                </ul>
+                @*<div style="height:50px; line-height:50px; background-color:#282B33;">&nbsp;</div>*@
+            </div>
+        </div>
+
+        <div class="layui-body">
+            <!-- 内容主体区域 -->
+            <div class="layui-tab" lay-filter="demo" lay-allowclose="true">
+                <ul class="layui-tab-title"></ul>
+                <div class="layui-tab-content">
+
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-footer">
+            <!-- 底部固定区域 -->
+            © layui.com - 底部固定区域
+        </div>
+    </div>
+
+    <script>
+        //JavaScript代码区域
+        function addTab(id, name, url) {
+            var isexist = false;
+            $(".layui-tab-title li").each(function () {
+                if ($(this).attr('lay-id') === id) {
+                    isexist = true;
+                }
+            });
+
+            if (!isexist) {
+                layui.element.tabAdd('demo',
+                    {
+                        title: name,
+                        content: '<iframe src="' + url + '" frameborder="0" class="layadmin-iframe"></iframe>',
+                        id: id
+                    });
+                layui.element.tabChange('demo', id);
+            } else {
+                layui.element.tabChange('demo', id);
+                var obj = $(".layui-show").find("iframe");
+                obj.attr("src", url);
+                //console.log(obj.attr("src"));
+            }
+
+            var display = $(".layui-layout-admin .img").css('display');
+            if (display === 'block') {
+                $(".layui-side").toggle();
+            }
+        }
+
+        layui.use('element', function () {
+            var $ = layui.jquery
+                , element = layui.element, tabindex; //Tab的切换功能，切换事件监听等，需要依赖element模块
+
+            //触发事件
+            var active = {
+                tabAdd: function (id, name, url) {
+                    //新增一个Tab项
+                    element.tabAdd('demo',
+                        {
+                            title: name,
+                            content: '<iframe src="' + url + '" frameborder="0" class="layadmin-iframe"></iframe>',
+                            id: id //实际使用一般是规定好的id，这里以时间戳模拟下
+                        });
+                }
+                , tabDelete: function (othis) {
+                    //删除指定Tab项
+                    element.tabDelete('demo', othis);
+                    othis.addClass('layui-btn-disabled');
+                }
+                , tabChange: function (id) {
+                    //切换到指定Tab项
+                    element.tabChange('demo', id); //切换到：用户管理
+                }
+            };
+
+            $('.site-demo-active').on('click', function () {
+                var othis = $(this), type = othis.data('type');
+                active[type] ? active[type].call(this, othis) : '';
+            });
+
+            //Hash地址的定位
+            var layid = location.hash.replace(/^#test=/, '');
+            element.tabChange('demo', layid);
+
+            element.on('tabClick(demo)', function (data) {
+                console.log(this); //当前Tab标题所在的原始DOM元素
+                console.log(data.index); //得到当前Tab的所在下标
+                console.log(data.elem); //得到当前的Tab大容器
+            });
+
+            element.on('tab(demo)', function (data) {
+
+            });
+
+        });
+    </script>
+    <script>
+        //JavaScript代码区域
+        layui.use('element', function () {
+            var element = layui.element;
+        });
+
+        $(".layui-layout-admin .img img").click(function () {
+            $(".layui-side").toggle();
+        });
+    </script>
+</body>
+</html>
